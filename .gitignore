@@ -1,0 +1,13 @@
+# 不要提交生成的图
+part1_plot*.png
+part2_figures/
+# （可选）忽略所有 PNG
+# *.png
+
+# 不要提交数据
+datasets/
+*.csv
+
+# Python 临时文件
+__pycache__/
+*.pyc
