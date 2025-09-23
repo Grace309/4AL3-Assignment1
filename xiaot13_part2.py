@@ -144,6 +144,59 @@ def visualize_feature_scatter_with_fit(df, feature, target_col="Age", out_dir="p
     plt.savefig(out_name, dpi=150, bbox_inches="tight")
     plt.close()
 
+def visualize_features_grid(df, features, target_col="Age", out_dir="part2_figures", filename="feature_grid.png"):
+    """
+    在一张图里对比所有特征：每个子图 = 该特征的散点 + 单变量 OLS 拟合线
+    会保存到 part2_figures/feature_grid.png
+    """
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    # 2 行 4 列的网格（7 个特征刚好放得下，留 1 个空位）
+    n_feats = len(features)
+    nrows, ncols = 2, 4
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(16, 8), sharey=True)
+    axes = axes.ravel()
+
+    y = df[target_col].to_numpy().reshape(-1, 1)
+
+    for i, feat in enumerate(features):
+        ax = axes[i]
+        x = df[feat].to_numpy().reshape(-1, 1)
+
+        # 单变量 OLS 直线：y = b0 + b1 * x
+        Xb = np.column_stack([np.ones(x.shape[0]), x])
+        beta = np.linalg.pinv(Xb.T @ Xb) @ (Xb.T @ y)
+
+        # 为了画直线更顺滑，先按 x 排序
+        idx = np.argsort(x[:, 0])
+        x_sorted = x[idx]
+        Xb_sorted = np.column_stack([np.ones(x_sorted.shape[0]), x_sorted])
+        y_line = (Xb_sorted @ beta).ravel()
+
+        # 画散点 + 拟合线
+        ax.scatter(x, y, s=10, alpha=0.6)
+        ax.plot(x_sorted, y_line, linestyle='--', linewidth=1.5, label='OLS fit')
+        ax.set_title(feat)
+        ax.set_xlabel(feat)
+        if i % ncols == 0:
+            ax.set_ylabel(target_col)
+        ax.legend(loc='best', fontsize=8)
+
+    # 隐藏多余子图（第 8 个）
+    if n_feats < nrows * ncols:
+        for j in range(n_feats, nrows * ncols):
+            axes[j].axis('off')
+
+    fig.suptitle(f"{target_col} vs Features (scatter + univariate OLS)", fontsize=14, y=0.98)
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
+
+    out_path = os.path.join(out_dir, filename)
+    plt.savefig(out_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+
+    print(f"已生成对比总图：{out_path}")
+
 
 # ---------- 训练/评估流程 ----------
 def run():
@@ -181,7 +234,9 @@ def run():
     # 可视化（每个特征一张图）
     for feat in features:
         visualize_feature_scatter_with_fit(df, feat, target_col="Age")
-    print("\n已生成 7 张散点图（文件名形如 '<Feature>_vs_Age.png'）。")
+    #print("\n已生成 7 张散点图（文件名形如 '<Feature>_vs_Age.png'）。")
+
+    visualize_features_grid(df, features, target_col="Age", out_dir="part2_figures", filename="feature_grid.png")
 
 if __name__ == "__main__":
     run()

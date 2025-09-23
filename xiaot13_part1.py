@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def load_and_prepare_data(possible_paths=None):
+def load_and_prepare_data():
     """
     Loads the dataset, filters to 2018, drops rows with missing values,
     and keeps records with happiness score > 4.5 (as in the class example).
@@ -16,20 +16,12 @@ def load_and_prepare_data(possible_paths=None):
         y_raw: array of raw happiness used (n,)
         x_std_1d, y_std_1d: standardized 1-D arrays for plotting (n,)
     """
-    if possible_paths is None:
-        possible_paths = [
-            "/mnt/data/gdp-vs-happiness.csv",         # notebook path
-            "gdp-vs-happiness.csv",                    # local folder
-            "datasets/gdp-vs-happiness.csv"           # as in provided example
-        ]
 
-    csv_path = None
-    for p in possible_paths:
-        if os.path.exists(p):
-            csv_path = p
-            break
-    if csv_path is None:
-        raise FileNotFoundError("Could not find gdp-vs-happiness.csv in expected locations.")
+    # 每次运行都提示用户输入路径
+    csv_path = input("请输入 gdp-vs-happiness.csv 的完整路径: ").strip()
+    if not csv_path or not os.path.exists(csv_path):
+        raise FileNotFoundError(f"找不到数据文件: {csv_path}")
+    print("使用的数据路径:", csv_path)
 
     df = pd.read_csv(csv_path)
 
