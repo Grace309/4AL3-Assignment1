@@ -1,50 +1,27 @@
-# Part 2: Abalone Age Prediction (OLS, no hard-coding, no extra libs)
-# Allowed libs only: os, pandas, numpy, matplotlib, seaborn, random
-# Usage (优先级从高到低):
-#   1) 设置环境变量 CSV_PATH 指向 csv
-#      Windows PowerShell:
-#         $env:CSV_PATH="C:\path\to\training_data.csv"; python xiaot13_part2.py
-#      macOS/Linux:
-#         CSV_PATH="/path/to/training_data.csv" python xiaot13_part2.py
-#   2) 将 training_data.csv 放在脚本同目录，直接运行：python xiaot13_part2.py
-#   3) 若找不到，会提示你输入路径
-
 import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ---------- 读取 CSV 路径（避免 hard-code） ----------
-def resolve_csv_path(default_name="training_data.csv"):
-    # 1) 环境变量优先
-    p = os.environ.get("CSV_PATH", "").strip()
-    if p and os.path.exists(p):
-        return p
-
-    # 2) 当前目录下的默认文件名
-    here = os.getcwd()
-    candidate = os.path.join(here, default_name)
-    if os.path.exists(candidate):
-        return candidate
-
-    # 3) 交互输入
-    print("未在当前目录找到 training_data.csv，且未设置 CSV_PATH 环境变量。")
-    user_p = input("请输入 CSV 完整路径（例如 C:\\Users\\you\\training_data.csv）：").strip()
+# ---------- read CSV PATH（avoid hard-code） ----------
+def resolve_csv_path():
+    """ask user to input full file path of dataset"""
+    user_p = input("please input complete PATH of dataset: ").strip()
     if not user_p:
-        raise FileNotFoundError("未提供 CSV 路径。")
+        raise FileNotFoundError("no CSV PATH input detected。")
     if not os.path.exists(user_p):
-        raise FileNotFoundError(f"提供的路径不存在：{user_p}")
+        raise FileNotFoundError(f"input CSV PATH not exist：{user_p}")
     return user_p
 
-# ---------- 加载与准备数据 ----------
+# ---------- loading and prepare data ----------
 def load_data():
     csv_path = resolve_csv_path()
     df = pd.read_csv(csv_path)
 
     if "Rings" not in df.columns:
-        raise ValueError("CSV 中未找到 'Rings' 列，无法计算 Age。请检查数据文件。")
+        raise ValueError("There is no 'Ring' Column in CSV, Cannot calculate Age. Please check the dataset file")
 
-    # 1) 先计算 Age
+    # 1) Calculate Age
     df["Age"] = df["Rings"] + 1.5
 
     # 2) 规范化列名（仅用于特征匹配的内部映射，不改变原 df 列名）
@@ -216,7 +193,7 @@ def run():
     beta = ols_beta(X_train, Y_train)
 
     # 打印系数
-    print("=== 数据来源 ===")
+    print("=== source of code ===")
     print(csv_path)
     print("\n=== 回归系数 β (OLS，多变量) ===")
     print(f"Intercept: {beta[0, 0]:.6f}")
