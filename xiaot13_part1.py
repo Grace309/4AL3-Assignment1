@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 def load_and_prepare_data():
     """
     Loads the dataset, filters to 2018, drops rows with missing values,
-    and keeps records with happiness score > 4.5 (as in the class example).
+    and keeps records with happiness score > 4.5 (as in the linear_Regression.py).
     Returns:
         X (n, 2): design matrix with column of ones and standardized GDP
         Y (n, 1): standardized happiness
@@ -17,14 +17,15 @@ def load_and_prepare_data():
         x_std_1d, y_std_1d: standardized 1-D arrays for plotting (n,)
     """
 
-    # 每次运行都提示用户输入路径
-    csv_path = input("请输入 gdp-vs-happiness.csv 的完整路径: ").strip()
+    #import data, ask user to input dataset file path everytime:
+    csv_path = input("Please input the full path of your dataset (e.g. gdp-vs-happiness.csv): ").strip()
     if not csv_path or not os.path.exists(csv_path):
-        raise FileNotFoundError(f"找不到数据文件: {csv_path}")
-    print("使用的数据路径:", csv_path)
+        raise FileNotFoundError(f"could not input file path: {csv_path}")
+    print("used file path:", csv_path)
 
     df = pd.read_csv(csv_path)
 
+    ##filter the data
     # Keep only 2018 data and required columns
     by_year = df[df['Year'] == 2018].drop(columns=["World regions according to OWID","Code"])
     # Drop NA in the two relevant columns
@@ -111,7 +112,7 @@ def denormalize_beta(beta_std, x_stats, y_stats):
     intercept_raw = y_mean + y_std * b0p - slope_raw * x_mean
     return intercept_raw, slope_raw
 
-def part1_experiment():
+def run():
     # Load data
     X, Y, x_stats, y_stats, x_raw, y_raw, x_std_1d, y_std_1d = load_and_prepare_data()
 
@@ -209,4 +210,4 @@ def part1_experiment():
 
 
 if __name__ == "__main__":
-    part1_experiment()
+    run()
