@@ -12,6 +12,7 @@ python xiaot13_part1.py
 
 2. The program will ask for the dataset path. Please provide the full path to:
 gdp-vs-happiness.csv
+(e.g., C:\Users\<username>\Desktop\Assignment1\datasets\gdp-vs-happiness.csv)
 
 ### Part 2
 1. Run the script:
@@ -20,6 +21,11 @@ python xiaot13_part2.py
 2. The program will ask for the dataset path. Please provide the full path to:
 training_data.csv
 (e.g., C:\Users\<username>\Desktop\Assignment1\datasets\training_data.csv)
+
+### Output
+Output figures are saved under 
+part1_figures/
+part2_figures/
 
 ## Requirements
 The following Python packages are required:
