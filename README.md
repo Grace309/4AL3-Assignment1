@@ -51,8 +51,8 @@ Following the course policy:
 - Model: ChatGPT (GPT-5)
 - Hardware type: Cloud GPU/TPU (provider: OpenAI)
 - Provider: OpenAI
-- Region of compute: Unknown (US-based datacenters)
-- Time used: ~2 hours of interaction for explanations, debugging, and writing
+- Region of compute: Hamilton
+- Time used: ~8 hours of interaction for explanations, debugging, and writing
 - Approximate estimate: ~50 queries × 4.32 gCO2 per query ≈ **216 gCO2**
 
 ---
