@@ -3,23 +3,19 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ---------- read CSV PATH（avoid hard-code） ----------
-def resolve_csv_path():
-    """ask user to input full file path of dataset"""
-    user_p = input("please input complete PATH of dataset: ").strip()
-    if not user_p:
-        raise FileNotFoundError("no CSV PATH input detected。")
-    if not os.path.exists(user_p):
-        raise FileNotFoundError(f"input CSV PATH not exist：{user_p}")
-    return user_p
 
 # ---------- loading and prepare data ----------
 def load_data():
-    csv_path = resolve_csv_path()
+    #import data, ask user to input dataset file path everytime:
+    csv_path = input("Please input the full path of your dataset (e.g. gdp-vs-happiness.csv): ").strip()
+    if not csv_path or not os.path.exists(csv_path):
+        raise FileNotFoundError(f"could not input file path: {csv_path}")
+    print("used file path:", csv_path)
+
     df = pd.read_csv(csv_path)
 
-    if "Rings" not in df.columns:
-        raise ValueError("There is no 'Ring' Column in CSV, Cannot calculate Age. Please check the dataset file")
+    # if "Rings" not in df.columns:
+    #     raise ValueError("There is no 'Ring' Column in CSV, Cannot calculate Age. Please check the dataset file")
 
     # 1) Calculate Age
     df["Age"] = df["Rings"] + 1.5
@@ -121,11 +117,7 @@ def visualize_feature_scatter_with_fit(df, feature, target_col="Age", out_dir="p
     plt.close()
 
 def visualize_features_grid(df, features, target_col="Age", out_dir="part2_figures", filename="feature_grid.png"):
-    """
-    Compare all features in one graph: Each subgraph = the scatter of the feature + the univariate OLS fitting line
-    It will be saved to part2_figures/feature_grid.png
-    
-    """
+    # make sure the folder exist
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 

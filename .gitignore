@@ -1,5 +1,5 @@
 # 不要提交生成的图
-part1_plot*.png
+part1_figures/
 part2_figures/
 # （可选）忽略所有 PNG
 # *.png

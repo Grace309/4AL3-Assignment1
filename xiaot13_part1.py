@@ -4,18 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def load_and_prepare_data():
-    """
-    Loads the dataset, filters to 2018, drops rows with missing values,
-    and keeps records with happiness score > 4.5 (as in the linear_Regression.py).
-    Returns:
-        X (n, 2): design matrix with column of ones and standardized GDP
-        Y (n, 1): standardized happiness
-        x_stats: (mean, std) for the GDP feature (raw space)
-        y_stats: (mean, std) for the happiness target (raw space)
-        x_raw: array of raw GDP used (n,)
-        y_raw: array of raw happiness used (n,)
-        x_std_1d, y_std_1d: standardized 1-D arrays for plotting (n,)
-    """
 
     #import data, ask user to input dataset file path everytime:
     csv_path = input("Please input the full path of your dataset (e.g. gdp-vs-happiness.csv): ").strip()
@@ -54,33 +42,19 @@ def load_and_prepare_data():
     return X, Y, (x_mean, x_std), (y_mean, y_std), x_raw, y_raw, x_std_1d, y_std_1d
 
 def mse(y_true, y_pred):
-    """Mean Squared Error."""
     diff = y_true - y_pred
     return float(np.mean(diff ** 2))
 
 def ols_beta(X, Y):
-    """
-    Closed-form OLS using the normal equation:
-        beta = (X^T X)^(-1) X^T Y
-    Uses pinv for numerical stability.
-    """
     XtX = X.T @ X
     XtY = X.T @ Y
     beta = np.linalg.pinv(XtX) @ XtY  # (2,1)
     return beta
 
 def predict(X, beta):
-    """Vectorized prediction: y_hat = X @ beta"""
     return X @ beta
 
 def gradient_descent(X, Y, lr=0.01, epochs=1000):
-    """
-    Batch Gradient Descent for linear regression with MSE loss.
-    Initializes beta at zeros.
-    Updates:
-        beta := beta - lr * (1/n) * X^T (X beta - Y)
-    Returns the learned beta (2x1).
-    """
     n, d = X.shape
     beta = np.zeros((d, 1))  # (2,1)
 
@@ -92,14 +66,6 @@ def gradient_descent(X, Y, lr=0.01, epochs=1000):
     return beta
 
 def denormalize_beta(beta_std, x_stats, y_stats):
-    """
-    Convert beta' (standardized space) back to raw-space coefficients.
-    Standardized model: y_std = b0' + b1' * x_std
-    Raw-space equivalent: y = a + b * x
-      where b = (y_std * b1') / x_std = (y_std / x_std) * b1'
-            a = y_mean + y_std*b0' - b*x_mean
-    Returns (intercept_raw, slope_raw)
-    """
     b0p = float(beta_std[0, 0])
     b1p = float(beta_std[1, 0])
     x_mean, x_std = x_stats
@@ -150,25 +116,31 @@ def run():
     best = results_sorted[0]
 
     # -----------------------------
-    # Plot 1: Scatter + multiple GD lines (standardized space)
+    # 设置输出目录
+    # -----------------------------
+    out_dir = "part1_figures"
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    # -----------------------------
+    # Plot 1: Scatter + multiple GD lines
     # -----------------------------
     plt.figure(figsize=(10, 6))
     plt.scatter(x_std_1d, Y, s=16)
     for r in results_sorted[:8]:  # up to 8 lines
         yhat = predict(X, r["beta"])
-        # Don't specify colors (per instructions); use labels for clarity
         plt.plot(x_std_1d, yhat, label=f"lr={r['lr']}, epochs={r['epochs']}")
 
     plt.title("Standardized Happiness vs Standardized GDP — Gradient Descent Fits")
     plt.xlabel("Standardized GDP per capita")
     plt.ylabel("Standardized Happiness (Cantril ladder)")
     plt.legend()
-    plot1_path = "part1_plot1_gd_lines.png"
+    plot1_path = os.path.join(out_dir, "part1_plot1_gd_lines.png")
     plt.savefig(plot1_path, dpi=150, bbox_inches="tight")
-    plt.show()
+    plt.close()
 
     # -----------------------------
-    # Plot 2: Scatter + OLS vs Best GD (standardized space)
+    # Plot 2: OLS vs Best GD
     # -----------------------------
     plt.figure(figsize=(10, 6))
     plt.scatter(x_std_1d, Y, s=16)
@@ -179,12 +151,12 @@ def run():
     plt.xlabel("Standardized GDP per capita")
     plt.ylabel("Standardized Happiness (Cantril ladder)")
     plt.legend()
-    plot2_path = "part1_plot2_ols_vs_bestgd.png"
+    plot2_path = os.path.join(out_dir, "part1_plot2_ols_vs_bestgd.png")
     plt.savefig(plot2_path, dpi=150, bbox_inches="tight")
-    plt.show()
+    plt.close()
 
     # -----------------------------
-    # Print coefficients (β′) and raw-space equivalents
+    # Print results
     # -----------------------------
     print("\n=== OLS (standardized space) ===")
     print(f"beta_prime (intercept, slope): {beta_ols.ravel()}")
